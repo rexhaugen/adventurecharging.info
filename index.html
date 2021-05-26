@@ -1,0 +1,296 @@
+<html>
+<head lang="en_US">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/></scrip>
+<title>Rivian Waypoints</title>
+<style>
+    html, body {
+	    height: 100%;
+		width: 100%;
+		padding: 0;
+		margin: 0;
+	}
+	#body {
+		overflow: scroll;
+	}
+	#page-header {
+		
+	}
+	#tip-link {
+		margin: 1%;
+		text-align: center;
+		width: 98%;
+		border: none;
+		height: 5em;
+	}
+    #map { 
+		visibility: hidden;
+	    height: 0%;
+		width: 100%;
+	}
+	#map-open-button {
+		margin: 1%;
+		text-align: center;
+		width: 98%;
+		border: none;
+		height: 5em;
+		background-color: #efefef;
+	}
+	#map-close-button {
+		position: absolute;
+		width: fit-content;
+		height: 4em;
+		border-style: none;
+		background-color: #efefef;
+		z-index: 500;
+		border-radius: 1em;
+		right: 0em;
+		margin: 1em;
+	}
+	#map-button:hover {
+		background-color: #cfcfcf;
+	}
+	#legend {
+		position: absolute;
+		margin: auto;
+		bottom: 36px;
+		right: 20px;
+		width: 130px;
+		height: 180px;
+		border-radius: 10%;
+		background: #FFFFFFBB;
+		z-index: 500;
+		padding: 10px;
+	}
+    .pin {
+        width: 30px;
+        height: 30px;
+        border-radius: 50% 50% 50% 0;
+        background: #FFFFFF;
+        position: absolute;
+        transform: rotate(-45deg);
+        left: 50%;
+        top: 50%;
+        margin: -30px 0 0 -15px;
+		z-index: 100;
+	}
+	.pin-permit {
+	    background: #FFD700
+	}
+    .pin-construction {
+        background: #008000
+    }
+    .pin-open {
+        background: #4682B4
+    }
+	.pin-none {
+        visibility: hidden;
+    }
+	.pin::before {
+        content: '';
+        width: 14px;
+        height: 14px;
+        margin: 8px 0 0 8px;
+        background: #FFFFFFEE;
+        position: absolute;
+        border-radius: 50%;
+		z-index: 101;
+    }
+	.leaflet-div-icon {
+	    border: none !important
+	}
+    .legend-content-top, .legend-content-middle, .legend-content-bottom {
+		padding-left: 10px;
+		font-weight: 200;
+		height: 60px;
+	}
+	.legend-content-top, .legend-content-middle {
+		border-bottom: 2px ridge;
+		padding-bottom: 5px;
+	}
+	.legend.pin.pin-permit, .legend.pin.pin-construction, .legend.pin.pin-open {
+		position: relative;
+		top: 20px;
+		left: 100px;
+	}
+	.legend-header {
+		text-align: center;
+		font-weight: 600;
+		height: 20px;
+	}
+	.site-name {
+		font-weight: 600;
+	}
+	#site-table {
+		border-collapse:collapse;
+		border-color:#ccc;
+		border-spacing:0;
+		width: 98%;
+		margin: 1%;
+	}
+	#site-table td {
+		border-color:#ccc;
+		border-style:solid;
+		border-width:1px;
+		color:#333;
+		font-family:Arial, sans-serif;
+		font-size:14px;
+		overflow:hidden;
+		padding:10px 5px;
+		word-break:normal;
+	}
+	#site-table th {
+		background-color:#f0f0f0;
+		border-color:#ccc;
+		border-style:solid;
+		border-width:1px;
+		color:#333;
+		font-family:Arial, sans-serif;
+		font-size:14px;
+		font-weight:normal;
+		overflow:hidden;
+		padding:10px 5px;
+		word-break:normal;
+	}
+	#site-table #site-table-header {
+		background-color:#e0e0e0;
+		position:-webkit-sticky;
+		position:sticky;
+		text-align:left;
+		top:-1px;vertical-align:top;
+		will-change:transform
+	}
+	tr:nth-child(odd) {
+		background-color:#efefef;
+	}
+	tr:nth-child(even) {
+		background-color:#ffffff;
+	}
+	#site-table #site-table-row {
+		text-align:left;vertical-align:top
+	}
+</style>
+<!-- <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script> -->
+<!-- <script src="https://unpkg.com/leaflet-providers@1.12.0/leaflet-providers.js" crossorigin=""></script> -->
+<!-- <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" crossorigin=""></script> -->
+</head>
+<body id="body">
+<div id="map">
+	<button id="map-close-button" onClick="closeMap();">
+		Click or tap here to hide the map
+	</button>
+	<div id="legend">
+		<div class="legend-header">Site status</div><br />
+		<div class="legend-content-top"><div class="legend pin pin-permit"></div>Permit</div><br />
+		<div class="legend-content-middle"><div class="legend pin pin-construction"></div>Construction</div><br />
+		<div class="legend-content-bottom"><div class="legend pin pin-open"></div>Open</div><br />
+	</div>
+</div>
+<div id="page-header">
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdwMETsvCEqF5V5f6jmwmldwSQguqcXfLRc0Tz6jXxPpEAE2g/viewform?usp=sf_link" rel="nofollow noopener" target="_blank">
+		<button id="tip-link">
+			Submit a tip using this Google Form
+		</button>
+	</a>
+	<button id="map-open-button" onClick="openMap();">
+		Click or tap here to view all locations on map
+	</button>
+</div>
+<div id="site-div">
+	<table id="site-table">
+		<!-- Built dyamically from GeoJSON -->
+	</table>
+</div>
+<!-- <script src="locations.geojson" type="text/javascript"></script> -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha384-RFZC58YeKApoNsIbBxf4z6JJXmh+geBSgkCQXFyh+4tiFSJmJBt+2FbjxW7Ar16M" crossorigin="anonymous"></script>
+<!-- <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script> -->
+<script type="text/javascript">
+	var pinPermit = L.divIcon({
+		iconSize: null,
+		html:'<div class="pin pin-permit"></div>'
+	});
+	var pinConstruction = L.divIcon({
+	    iconSize: null,
+		html:'<div class="pin pin-construction"></div>'
+	});
+	var pinOpen = L.divIcon({
+	    iconSize: null,
+		html:'<div class="pin pin-open"></div>'
+    });
+	var pinNone = L.divIcon({
+	    iconSize: null,
+		html:'<div class="pin pin-none"></div>'
+    });
+	console.log("Leaflet loading");
+	var map = L.map('map').setView({lon: -98.583333, lat: 39.833333}, 5);
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 18,
+		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	}).addTo(map);
+	L.control.scale().addTo(map);
+	console.log("Leaflet initialized");
+	function pinIcon(curStatus){
+		console.log("PinIcon: " + curStatus);
+		switch (curStatus){
+			case "permit": return pinPermit;
+			case "construction": return pinConstruction;
+			case "open": return pinOpen;
+			default: return pinNone;
+		}
+	}
+	function pinPopup (feature, layer){
+		console.log("PinPopup: " + feature.properties.curStatus + " " + feature.properties.curStatusDate + " " + layer);
+		var permitDateSet = "";
+		var constructionDateSet = "";
+		var openDateSet = "";
+		if (feature.properties.permitDate != ""){permitDateSet = "Permit date: " + feature.properties.permitDate + "<br />"};
+		if (feature.properties.constructionDate != ""){constructionDateSet = "Construction date: " + feature.properties.constructionDate + "<br />"};
+		if (feature.properties.openDate != ""){openDateSet = "Open date: " + feature.properties.openDate + "<br />"};
+		switch (feature.properties.curStatus.toLowerCase()){
+			case "permit": return layer.bindPopup("<div class='site-name'>" + feature.properties.name + "<br />permit issued</div><br />Status updated: " + feature.properties.curStatusDate + "<div><br /></div>" + permitDateSet + constructionDateSet + openDateSet);
+			case "construction": return layer.bindPopup("<div class='site-name'>" + feature.properties.name + "<br />under construction</div><br />Status updated: " + feature.properties.curStatusDate + "<div><br /></div>"  + permitDateSet + constructionDateSet + openDateSet);
+			case "open": return layer.bindPopup("<div class='site-name'>" + feature.properties.name + "<br />station open</div><br />Status updated: " + feature.properties.curStatusDate + "<div><br /></div>"  + permitDateSet + constructionDateSet + openDateSet);
+			default: return;
+		}
+	}
+	fetch("locations.geojson")
+	.then(function(response) {
+		console.log("Loading GeoJSON");
+		return response.json();
+	})
+	.then(function(data) {
+        geoJsonLayer = L.geoJSON(data, {
+            pointToLayer: function (feature, latlng) {
+			    label = String(feature.properties.name)
+				console.log("DivIcon: " + feature.properties.curStatus + " " + feature.properties.curStatusDate);
+                return new L.marker(latlng, {
+				    icon: pinIcon(feature.properties.curStatus)
+				});
+            },
+			onEachFeature: pinPopup
+		}).addTo(map);
+		map.fitBounds(geoJsonLayer.getBounds());
+		document.getElementById("site-table").innerHTML += "<thead><tr><th id='site-table-header'>Site Name</th><th id='site-table-header'>Status</th><th id='site-table-header'>Last Updated</th><th id='site-table-header'>Permit Date</th><th id='site-table-header'>Construction Date</th><th id='site-table-header'>Open Date</th><th id='site-table-header'>Discussion</th><th id='site-table-header'>Latitude</th><th id='site-table-header'>Longitude</th></tr></thead>";
+		document.getElementById("site-table").innerHTML += "<tbody>";
+		data.features.forEach(function(feature) {
+			document.getElementById("site-table").innerHTML += "<tr><td>" + feature.properties.name + "</td><td>" + feature.properties.curStatus.toUpperCase() + "</td><td>" + feature.properties.curStatusDate + "</td><td>" + feature.properties.permitDate + "</td><td>" + feature.properties.constructionDate + "</td><td>" + feature.properties.openDate + "</td><td><a href='" + feature.properties.discussionURL + "' target='_blank' rel='nofollow noopener'>" + feature.properties.discussionURLDisplay + "</a></td><td>" + feature.geometry.coordinates[0] + "</td><td>" + feature.geometry.coordinates[1] + "</td></tr>";
+		});
+		document.getElementById("site-table").innerHTML += "</tbody>";
+    });
+	function openMap() {
+		console.log("Display map");
+		document.getElementById('map').style.visibility = 'visible';
+		document.getElementById('map').style.height = '100%';
+		document.getElementById('body').style.overflow = 'hidden';
+		map.invalidateSize();
+	}
+	function closeMap() {
+		console.log("Hide map");
+		document.getElementById('map').style.visibility = 'hidden';
+		document.getElementById('map').style.height = '0%';
+		document.getElementById('body').style.overflow = 'scroll';
+	}
+</script>
+</body>
+</html>

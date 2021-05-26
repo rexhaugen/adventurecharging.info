@@ -222,14 +222,14 @@
 	    iconSize: null,
 		html:'<div class="pin pin-none"></div>'
     });
-	console.log("Leaflet loading");
+	console.log("Leaflet loading"); 
 	var map = L.map('map').setView({lon: -98.583333, lat: 39.833333}, 5);
 	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 18,
 		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 	}).addTo(map);
 	L.control.scale().addTo(map);
-	console.log("Leaflet initialized");
+	/* console.log("Leaflet initialized"); */
 	function pinIcon(curStatus){
 		console.log("PinIcon: " + curStatus);
 		switch (curStatus){
@@ -240,7 +240,7 @@
 		}
 	}
 	function pinPopup (feature, layer){
-		console.log("PinPopup: " + feature.properties.curStatus + " " + feature.properties.curStatusDate + " " + layer);
+		/* console.log("PinPopup: " + feature.properties.curStatus + " " + feature.properties.curStatusDate + " " + layer); */
 		var permitDateSet = "";
 		var constructionDateSet = "";
 		var openDateSet = "";
@@ -263,7 +263,7 @@
         geoJsonLayer = L.geoJSON(data, {
             pointToLayer: function (feature, latlng) {
 			    label = String(feature.properties.name)
-				console.log("DivIcon: " + feature.properties.curStatus + " " + feature.properties.curStatusDate);
+				/* console.log("DivIcon: " + feature.properties.curStatus + " " + feature.properties.curStatusDate); */
                 return new L.marker(latlng, {
 				    icon: pinIcon(feature.properties.curStatus)
 				});
@@ -279,14 +279,14 @@
 		document.getElementById("site-table").innerHTML += "</tbody>";
     });
 	function openMap() {
-		console.log("Display map");
+		/* console.log("Display map"); */
 		document.getElementById('map').style.visibility = 'visible';
 		document.getElementById('map').style.height = '100%';
 		document.getElementById('body').style.overflow = 'hidden';
 		map.invalidateSize();
 	}
 	function closeMap() {
-		console.log("Hide map");
+		/* console.log("Hide map"); */
 		document.getElementById('map').style.visibility = 'hidden';
 		document.getElementById('map').style.height = '0%';
 		document.getElementById('body').style.overflow = 'scroll';

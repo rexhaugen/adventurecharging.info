@@ -3,12 +3,12 @@
         "type": "Feature",
         "properties": {
             "name": "Salida, CO, USA",
-            "curStatusDate": "2021-05-13",
+            "curStatusDate": "2022-06-27",
             "show_on_map": true,
             "curStatus": "construction",
 			"permitDate": "2021-01-05",
 			"constructionDate": "2021-05-13",
-			"openDate": "",
+			"openDate": "2022-06-27",
 			"discussionURL": "https://www.rivianforums.com/forum/threads/rivian-charging-station-in-salida-co-is-under-construction.1471/",
 			"discussionURLDisplay": "Rivian Forums"
         },

@@ -5,7 +5,7 @@
             "name": "Salida, CO, USA",
             "curStatusDate": "2022-06-27",
             "show_on_map": true,
-            "curStatus": "construction",
+            "curStatus": "open",
 			"permitDate": "2021-01-05",
 			"constructionDate": "2021-05-13",
 			"openDate": "2022-06-27",
@@ -14,7 +14,7 @@
         },
         "geometry": {
             "type": "Point",
-            "coordinates": [-105.994588,38.536560]
+            "coordinates": [38.536560,-105.994588]
         }
     },
     {
@@ -32,7 +32,7 @@
         },
         "geometry": {
             "type": "Point",
-            "coordinates": [-84.70900440484306, 44.65048168157813]
+            "coordinates": [44.650481,-84.709004]
         }
     }
 ]}
